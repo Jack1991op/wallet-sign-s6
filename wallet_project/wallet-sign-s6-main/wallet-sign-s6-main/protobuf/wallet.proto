@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+option go_package = "./protobuf/wallet";
+package theweb3.wallet;
+
+enum ReturnCode{
+  ERROR = 0;
+  SUCCESS = 1;
+}
+
+message ChainSignMethodRequest {
+  string consumer_token = 1;
+  string chain_name = 2;
+  string network = 3;
+  string asset_type = 4;
+}
+
+message ChainSignMethodResponse {
+  ReturnCode code = 1;
+  string message = 2;
+  string sign_method = 3;
+}
+
+message ChainSchemaRequest {
+  string consumer_token = 1;
+  string chain_name = 2;
+  string network = 3;
+  string asset_type = 4;
+}
+
+message ChainSchemaResponse {
+  ReturnCode code = 1;
+  string message = 2;
+  string schema = 3;
+}
+
+message ExportPublicKey {
+    string public_key = 1;
+    string compress_public_key = 2;
+}
+
+message CreateKeyPairAndExportPublicKeyRequest {
+  string consumer_token = 1;
+  string chain_name = 2;
+  string network = 3;
+  uint64 key_num  = 4;
+}
+
+message CreateKeyPairAndExportPublicKeyResponse{
+  ReturnCode code = 1;
+  string message = 2;
+  repeated ExportPublicKey public_key_list = 3;
+}
+
+message ExportPublicKeyWithAddress {
+  string public_key = 1;
+  string compress_public_key = 2;
+  string address = 3;
+}
+
+message CreateKeyPairsWithAddressesRequest {
+  string consumer_token = 1;
+  string chain_name = 2;
+  string network = 3;
+  string address_format = 4;
+  uint64 key_num  = 5;
+}
+
+message CreateKeyPairsWithAddressesResponse{
+  ReturnCode code = 1;
+  string message = 2;
+  repeated ExportPublicKeyWithAddress public_key_addresses = 3;
+}
+
+message SignTransactionMessageRequest {
+  string consumer_token = 1;
+  string chain_name = 2;
+  string network = 3;
+  string public_key = 4;
+  string message_hash = 5;
+}
+
+message SignTransactionMessageResponse {
+  ReturnCode Code = 1;
+  string message = 2;
+  string signature = 3;
+}
+
+message BuildAndSignTransactionRequest {
+  string consumer_token = 1;
+  string chain_name = 2;
+  string network = 3;
+  string public_key = 4;
+  string wallet_key_hash = 5;
+  string risk_key_hash = 6;
+  string tx_base64_body = 7;
+}
+
+message BuildAndSignTransactionResponse {
+  ReturnCode code = 1;
+  string message = 2;
+  string tx_message_hash = 3;
+  string tx_hash = 4;
+  string signed_tx = 5;
+}
+
+message TransactionMessage {
+  string public_key = 1;
+  string wallet_key_hash = 2;
+  string risk_key_hash = 3;
+  string tx_base64_body = 4;
+}
+
+message TransactionWithSign {
+  string tx_message_hash = 1;
+  string tx_hash = 2;
+  string signed_tx = 3;
+}
+
+message BuildAndSignBatchTransactionRequest {
+  string consumer_token = 1;
+  string chain_name = 2;
+  string network = 3;
+  repeated TransactionMessage tx_msg = 4;
+}
+
+message BuildAndSignBatchTransactionResponse {
+  ReturnCode code = 1;
+  string message = 2;
+  repeated TransactionWithSign tx_with_sign = 3;
+}
+
+service WalletService {
+  rpc getChainSignMethod(ChainSignMethodRequest) returns(ChainSignMethodResponse) {}
+  rpc getChainSchema(ChainSchemaRequest) returns (ChainSchemaResponse) {}
+  rpc createKeyPairsExportPublicKeyList(CreateKeyPairAndExportPublicKeyRequest) returns (CreateKeyPairAndExportPublicKeyResponse) {}
+  rpc createKeyPairsWithAddresses(CreateKeyPairsWithAddressesRequest) returns (CreateKeyPairsWithAddressesResponse) {}
+  // --根据 32 字节的 hash 进行签名的过程--
+  rpc signTransactionMessage(SignTransactionMessageRequest) returns (SignTransactionMessageResponse) {}
+  //-- 完整签名的流程--
+  rpc buildAndSignTransaction(BuildAndSignTransactionRequest) returns (BuildAndSignTransactionResponse);
+  rpc buildAndSignBatchTransaction(BuildAndSignBatchTransactionRequest) returns (BuildAndSignBatchTransactionResponse);
+}
